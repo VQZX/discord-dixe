@@ -1,7 +1,9 @@
 const graf = require('discord-graf');
-const diceExpression = require('dice-expression-evaluator');
 
-const pattern = /^(.+?)(?:(>{1,2}|<{1,2})\s*([0-9]+?))?\s*$/;
+// Leaving for reference because this is some messy developmet, TIMOTHY!
+//const pattern = /^(.+?)(?:(>{1,2}|<{1,2})\s*([0-9]+?))?\s*$/;
+
+const diceUtility = require("dice-utility");
 
 module.exports = class FakeRollDiceCommand extends graf.Command
 {
@@ -21,10 +23,10 @@ module.exports = class FakeRollDiceCommand extends graf.Command
         });
     }
 
-    run(message, args, fromPattern)
+    run(message, args)
     {
         // eslint-disable-line complexity
-        const response = message+" args: "+args+" fromPattern: "+fromPattern;
+        const response = diceUtility.stat_dice("stat_dice "+message+" "+args);
         return Promise.resolve({ plain: response, editable: false });
     }
 }

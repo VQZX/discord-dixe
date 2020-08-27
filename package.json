@@ -17,6 +17,7 @@
     "discord-graf": "^0.15.0",
     "discord.js": "^11.6.4",
     "dotenv": "^8.2.0",
+    "dice-utility" : "1.0.0",
     "highlight.js": "^10.1.2"
   },
   "devDependencies": {
