@@ -2,7 +2,7 @@
 'use strict';
 
 const graf = require('discord-graf');
-const diceExpression = require('dice-expression-evaluator');
+const DiceExpression = require('dice-expression-evaluator');
 
 module.exports = class MinRollCommand extends graf.Command {
     constructor(bot)
@@ -25,11 +25,11 @@ module.exports = class MinRollCommand extends graf.Command {
     {
         if(!args[0])
         {
-            throw new diceExpression.CommandFormatError(this, message.guild);
+            throw new DiceExpression.CommandFormatError(this, message.guild);
         }
         try
         {
-            const minRoll = new diceExpression(args[0]).min();
+            const minRoll = new DiceExpression(args[0]).min();
             let response = `The minimum possible roll is **${minRoll}**.`;
             return Promise.resolve(response);
         }

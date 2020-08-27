@@ -2,7 +2,7 @@
 'use strict';
 
 const graf = require('discord-graf');
-const diceExpression = require('dice-expression-evaluator');
+const DiceExpression = require('dice-expression-evaluator');
 
 const pattern = /^(.+?)(?:(>{1,2}|<{1,2})\s*([0-9]+?))?\s*$/;
 
@@ -46,7 +46,7 @@ module.exports = class RollDiceCommand extends graf.Command
         try
         {
             const matches = fromPattern ? args : pattern.exec(args[0]);
-            const dice = new diceExpression(matches[1]);
+            const dice = new DiceExpression(matches[1]);
 
             // Restrict the maximum dice count
             const totalDice = dice.dice.reduce((prev, die) => prev + (die.diceCount || 1), 0);
@@ -74,7 +74,8 @@ module.exports = class RollDiceCommand extends graf.Command
 					`;
 
                     // Target for individual dice (success counting)
-                } else if(matches[2] === '>>' || matches[2] === '<<')
+                }
+                else if(matches[2] === '>>' || matches[2] === '<<')
                 {
                     if(rollResult.diceRaw.length !== 1)
                     {
@@ -86,7 +87,6 @@ module.exports = class RollDiceCommand extends graf.Command
 						${message.author} has **${successes > 0 ? `succeeded ${successes} time${successes !== 1 ? 's' : ''}` : `failed`}**.
 						${rollResult.diceRaw[0].length > 1 && rollResult.diceRaw[0].length <= 100 ? `(${rollResult.diceRaw[0].join(',   ')})` : ''}
 					`;
-
                     // Oh dear.
                 }
                 else
@@ -110,9 +110,11 @@ module.exports = class RollDiceCommand extends graf.Command
         }
     }
 
-    buildDiceList(result, totalDice) {
+    buildDiceList(result, totalDice)
+    {
         let diceList = '';
-        if(totalDice <= 100 && (result.diceRaw.length > 1 || (result.diceRaw.length > 0 && result.diceRaw[0].length > 1))) {
+        if(totalDice <= 100 && (result.diceRaw.length > 1 || (result.diceRaw.length > 0 && result.diceRaw[0].length > 1)))
+        {
             diceList = result.diceRaw.map((res, i) => this.bot.util.nbsp(res.length > 1 ? `${res.join(' + ')} = ${result.diceSums[i]}` : res[0])).join(',   ');
         }
         return diceList;
