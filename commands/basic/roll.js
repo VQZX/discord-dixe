@@ -93,20 +93,20 @@ module.exports = class RollDiceCommand extends graf.Command
                 {
                     throw new Error('Unknown target operator. This should not ever happen.');
                 }
-                return { plain: response, editable: false };
+                return Promise.resolve({ plain: response, editable: false });
             }
             else
             {
                 const diceList = this.buildDiceList(rollResult, totalDice);
-                return {
+                return Promise.resolve({
                     plain: `${message.author} rolled **${rollResult.roll}**.${diceList ? ` (${diceList})` : ''}`,
                     editable: false
-                };
+                });
             }
         }
         catch(error)
         {
-            return { plain: `${message.author} specified an invalid dice expression.` };
+            return Promise.resolve({ plain: `${message.author} specified an invalid dice expression.` });
         }
     }
 

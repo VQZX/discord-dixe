@@ -11,7 +11,6 @@ const rollfakeCommand = require('./commands/basic/roll-fake');
 const maxCommand = require('./commands/basic/max');
 const minCommand = require('./commands/basic/min');
 
-const config = require('./config');
 // Alright alright, the above compiles
 const version = '0.0.1';
 
@@ -21,13 +20,13 @@ const dixeBot = new graf.Bot
         name: 'Dixe-Bot',
         version: version,
         token: config.token,
-        email: 'tpflusk@gmail.com',
+        email: 'youcantgetmyemailaddress@copper.com',
         password: 'thisisapasswordipromise',
         clientOptions:
             {
                 disable_everyone: true
             },
-        about: 'To help with some wiggle TTTRPS',
+        about: 'To help with some wiggle TTTRPGs',
         updateURL: 'https://raw.githubusercontent.com/VQZX/discord-dixe/master/package.json?token=AA3JSQIHEROA4PAJTAISPAK7IXIS4'
     }
 );
@@ -35,10 +34,10 @@ const dixeBot = new graf.Bot
 // Add some commands
 const modules = [
     ['basic', 'Basic'],
-    ['debug', 'Debug']
+    ['test', 'Test']
 ];
 
-const commands = [debugCommand, minCommand, maxCommand, rollCommand, rollfakeCommand];
+const commands = [rollfakeCommand, debugCommand, minCommand, maxCommand, rollCommand];
 const client = dixeBot.
     registerDefaults().
     registerModules(modules).

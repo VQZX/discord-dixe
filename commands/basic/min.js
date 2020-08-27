@@ -30,11 +30,13 @@ module.exports = class MinRollCommand extends graf.Command {
         try
         {
             const minRoll = new DiceExpression(args[0]).min();
-            return `The minimum possible roll is **${minRoll}**.`;
+            let response = `The minimum possible roll is **${minRoll}**.`;
+            return Promise.resolve(response);
         }
         catch(error)
         {
-            return 'Invalid dice expression specified.';
+            let response = 'Invalid dice expression specified.';
+            return Promise.resolve(response);
         }
     }
 }

@@ -34,11 +34,13 @@ module.exports = class MaxRollCommand extends  graf.Command
         try
         {
             const maxRoll = new DiceExpression(args[0].max());
-            return 'The maximum possible roll is **'
+            let response = 'The maximum possible roll is *maxRoll*';
+            return Promise.resolve(response);
         }
         catch (error)
         {
-            return "Invalid dice expression";
+            const response = message+" args: "+args[0];
+            return Promise.resolve("Invalid dice expression "+response);
         }
     }
 }

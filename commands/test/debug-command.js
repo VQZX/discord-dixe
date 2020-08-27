@@ -11,10 +11,10 @@ module.exports = class DebugCommand extends graf.Command
             {
                 name: 'debug',
                 aliases: ['debug', 'check-bot', 'test'],
-                module: 'debug',
+                module: 'test',
                 memberName: 'debug',
                 description: 'A simple command to test bot flow',
-                usage: 'debug-command'
+                usage: 'debug'
             }
         );
     }
