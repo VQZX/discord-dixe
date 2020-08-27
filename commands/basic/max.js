@@ -1,9 +1,6 @@
 'use babel';
 'use strict';
 
-//import {Command, CommandFormatError} from 'discord-graf/lib/index.js';
-//import DiceExpression from 'dice-expression-evaluator'
-
 const graf = require('discord-graf');
 const diceExpression = require('dice-expression-evaluator');
 
@@ -33,14 +30,13 @@ module.exports = class MaxRollCommand extends  graf.Command
         }
         try
         {
-            const maxRoll = new DiceExpression(args[0].max());
-            let response = 'The maximum possible roll is *maxRoll*';
+            const maxRoll = new diceExpression(args[0]).max();
+            let response = `The maximum possible roll is **${maxRoll}**`;
             return Promise.resolve(response);
         }
         catch (error)
         {
-            const response = message+" args: "+args[0];
-            return Promise.resolve("Invalid dice expression "+response);
+            return Promise.resolve("Invalid dice expression: "+error);
         }
     }
 }
