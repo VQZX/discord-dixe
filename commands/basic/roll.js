@@ -6,7 +6,7 @@ const DiceExpression = require('dice-expression-evaluator');
 const diceUtility = require('dice-utility');
 const oneLine = require('common-tags/lib/oneLine');
 
-const basicConfig = require('dice-utility/basicConfig');
+// ([a-zA-z]+\s(([0-9]+[d|D][0-9]+)(\s*\+\s*[0-9]+[d|D][0-9]+)*))
 
 
 const basicPattern = /^(.+?)(?:(>{1,2}|<{1,2})\s*([0-9]+?))?\s*$/;
@@ -46,7 +46,7 @@ module.exports = class RollDiceCommand extends graf.Command
         this.bot.logger.info("Dixe: "+args);
 
         var isAdvancedPattern = advancedPattern.exec(args) != null;
-        var isBasicPattern = basicPattern.exec(args) != null && isAdvancedPattern == false;
+        var isBasicPattern = basicPattern.exec(args) != null && isAdvancedPattern === false;
 
         this.bot.logger.info("Basic: "+isBasicPattern+", Advanced: "+isAdvancedPattern);
 
