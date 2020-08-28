@@ -6,7 +6,11 @@ const DiceExpression = require('dice-expression-evaluator');
 const diceUtility = require('dice-utility');
 const oneLine = require('common-tags/lib/oneLine');
 
-const pattern = /^(.+?)(?:(>{1,2}|<{1,2})\s*([0-9]+?))?\s*$/;
+const basicConfig = require('dice-utility/basicConfig');
+
+
+const basicPattern = /^(.+?)(?:(>{1,2}|<{1,2})\s*([0-9]+?))?\s*$/;
+const advancedPattern = /([a-zA-z]+\s[0-9]+[d|D][0-9]+)/;
 
 module.exports = class RollDiceCommand extends graf.Command
 {
@@ -28,13 +32,23 @@ module.exports = class RollDiceCommand extends graf.Command
 				When just a single plain number is provided, it will be interpreted as a single die with that many sides.
 			`,
             examples: ['roll 2d20', 'roll 3d20 - d10 + 6', 'roll d20 > 10', 'roll 6d20 >> 14', 'roll', 'roll 30', 'Billy McBillface attempts to slay the dragon. (Roll: d20 > 10)'],
-            patterns: [/\(\s*(?:roll|dice|rolldice|diceroll):\s*(.+?)(?:(>{1,2}|<{1,2})\s*([0-9]+?))?\s*\)/i]
+            patterns: [
+                /\(\s*(?:roll|dice|rolldice|diceroll):\s*(.+?)(?:(>{1,2}|<{1,2})\s*([0-9]+?))?\s*\)/i,
+                /\(\s*(?:roll|dice|rolldice|diceroll):(\s*([a-zA-z]+\s[0-9]+[d|D][0-9]+)(,\s)?)+/i
+            ]
         });
     }
 
     run(message, args, fromPattern)
     { // eslint-disable-line complexity
         const firstArgIndex = fromPattern ? 1 : 0;
+
+        this.bot.logger.info("Dixe: "+args);
+
+        var isAdvancedPattern = advancedPattern.exec(args) != null;
+        var isBasicPattern = basicPattern.exec(args) != null && isAdvancedPattern == false;
+
+        this.bot.logger.info("Basic: "+isBasicPattern+", Advanced: "+isAdvancedPattern);
 
         // blank roll maps to d20
         if(!args[firstArgIndex])
@@ -52,63 +66,92 @@ module.exports = class RollDiceCommand extends graf.Command
         }
         try
         {
-            const matches = fromPattern ? args : pattern.exec(args[0]);
-            const dice = new DiceExpression(matches[1]);
-
-            // Restrict the maximum dice count
-            const totalDice = dice.dice.reduce((prev, die) => prev + (die.diceCount || 1), 0);
-            if(totalDice > 1000) return { plain: `${message.author} might hurt themselves by rolling that many dice at once!` };
-
-            // Roll the dice
-            const rollResult = dice.roll();
-            this.bot.logger.debug('Dice rolled.', { dice: dice.dice, result: rollResult, totalDice: totalDice });
-
-            if(matches[2])
+            if ( isBasicPattern )
             {
-                // Deal with target operations
-                const target = parseInt(matches[3]);
-                let response;
-
-                // Target for total roll
-                // Checking for greater-than, and less-than a value
-                if(matches[2] === '>' || matches[2] === '<')
-                {
-                    response = this.inequalityCheck(matches, rollResult, target, totalDice, message);
-                }
-                // Target for individual dice (success counting)
-                else if(matches[2] === '>>' || matches[2] === '<<')
-                {
-                    // Count the amount successful throw
-                    if(rollResult.diceRaw.length !== 1)
-                    {
-                       return { plain: `${message.author} tried to count successes with multiple dice expressions.` };
-                    }
-                    response = this.countSuccesses(rollResult, matches, target, message);
-                }
-                else
-                {
-                    response = diceUtility.parse(args);
-
-                    ////////////////////////////////////////////////////////////////////////////////////////////////
-
-                    // Tim: Keeping this error around if there is anyway we can use it
-                    // Oh dear.
-                    //throw new Error('Unknown target operator. This should not ever happen.');
-                }
-                return Promise.resolve({ plain: response, editable: false });
+                return this.basicResponse(fromPattern, args, message);
             }
-            else
+            else if (isAdvancedPattern)
             {
-                const diceList = this.buildDiceList(rollResult, totalDice);
-                return Promise.resolve({
-                    plain: `${message.author} rolled **${rollResult.roll}**.${diceList ? ` (${diceList})` : ''}`,
-                    editable: false
-                });
+                return this.advancedResponse(fromPattern, args, message);
             }
         }
         catch(error)
         {
             return Promise.resolve({ plain: `${message.author} specified an invalid dice expression. ${error}` });
+        }
+    }
+
+    advancedResponse(fromPattern, args, message)
+    {
+        const matches = args.match(advancedPattern);
+        let response = '';
+        for(let i = 0; i < matches.length; i++)
+        {
+            response += i+". "+matches[i]+"\n";
+        }
+
+        this.bot.logger.info(response);
+        return Promise.resolve("Advanced Pattern. Response incoming");
+    }
+
+    basicResponse(fromPattern, args, message)
+    {
+        const matches = fromPattern ? args : basicPattern.exec(args[0]);
+        const dice = new DiceExpression(matches[1]);
+
+        // Restrict the maximum dice count
+        const totalDice = dice.dice.reduce((prev, die) => prev + (die.diceCount || 1), 0);
+        if (totalDice > 1000)
+        {
+            return {plain: `${message.author} might hurt themselves by rolling that many dice at once!`};
+        }
+
+        // Roll the dice
+        const rollResult = dice.roll();
+        this.bot.logger.debug('Dice rolled.', {dice: dice.dice, result: rollResult, totalDice: totalDice});
+
+        if (matches[2])
+        {
+            // Deal with target operations
+            const target = parseInt(matches[3]);
+            let response;
+
+            // Target for total roll
+            // Checking for greater-than, and less-than a value
+            if (matches[2] === '>' || matches[2] === '<')
+            {
+                response = this.inequalityCheck(matches, rollResult, target, totalDice, message);
+            }
+            // Target for individual dice (success counting)
+            else if (matches[2] === '>>' || matches[2] === '<<')
+            {
+                // Count the amount successful throw
+                if (rollResult.diceRaw.length !== 1)
+                {
+                    return {plain: `${message.author} tried to count successes with multiple dice expressions.`};
+                }
+                response = this.countSuccesses(rollResult, matches, target, message);
+            } else
+            {
+                response = diceUtility.parse(args);
+                ////////////////////////////////////////////////////////////////////////////////////////////////
+
+                // Tim: Keeping this error around if there is anyway we can use it
+                // Oh dear.
+                //throw new Error('Unknown target operator. This should not ever happen.');
+            }
+            response = response + "\n" + fromPattern;
+            this.bot.logger.info("Tim " + response);
+            return Promise.resolve({plain: response, editable: false});
+        } else
+        {
+            const diceList = this.buildDiceList(rollResult, totalDice);
+            let output = `${message.author} rolled **${rollResult.roll}**.${diceList ? ` (${diceList})` : `Pattern: ${fromPattern}`} `;
+            this.bot.logger.info("TIIIIMMMM: " + output);
+            return Promise.resolve({
+                plain: output,
+                editable: false
+            });
         }
     }
 

@@ -26,7 +26,7 @@ module.exports = class FakeRollDiceCommand extends graf.Command
     run(message, args)
     {
         // eslint-disable-line complexity
-        const response = diceUtility.stat_dice("stat_dice "+message+" "+args);
+        const response = diceUtility.stat_dice("stat_dice 2 "+message+" "+args);
         return Promise.resolve({ plain: response, editable: false });
     }
 }
