@@ -10,7 +10,7 @@ const basicConfig = require('dice-utility/basicConfig');
 
 
 const basicPattern = /^(.+?)(?:(>{1,2}|<{1,2})\s*([0-9]+?))?\s*$/;
-const advancedPattern = /([a-zA-z]+\s[0-9]+[d|D][0-9]+)/;
+const advancedPattern = diceUtility.statPattern;
 
 module.exports = class RollDiceCommand extends graf.Command
 {
@@ -51,17 +51,20 @@ module.exports = class RollDiceCommand extends graf.Command
         this.bot.logger.info("Basic: "+isBasicPattern+", Advanced: "+isAdvancedPattern);
 
         // blank roll maps to d20
-        if(!args[firstArgIndex])
+        if ( isBasicPattern )
         {
-            // cute defaulting
-            args[firstArgIndex] = 'd20';
-        }
-        else
-        {
-            const rawNumber = parseInt(args[firstArgIndex]);
-            if(!isNaN(rawNumber) && String(rawNumber) === args[firstArgIndex])
+            if(!args[firstArgIndex])
             {
-                args[firstArgIndex] = `d${rawNumber}`;
+                // cute defaulting
+                args[firstArgIndex] = 'd20';
+            }
+            else
+            {
+                const rawNumber = parseInt(args[firstArgIndex]);
+                if(!isNaN(rawNumber) && String(rawNumber) === args[firstArgIndex])
+                {
+                    args[firstArgIndex] = `d${rawNumber}`;
+                }
             }
         }
         try
@@ -83,15 +86,15 @@ module.exports = class RollDiceCommand extends graf.Command
 
     advancedResponse(fromPattern, args, message)
     {
-        const matches = args.match(advancedPattern);
-        let response = '';
-        for(let i = 0; i < matches.length; i++)
+        const results = diceUtility.statDice(args[0]);
+        let result = '```';
+        for(let i = 0; i < results.length; i++)
         {
-            response += i+". "+matches[i]+"\n";
+            result += results[i]['pretty-print']+"\n";
         }
-
-        this.bot.logger.info(response);
-        return Promise.resolve("Advanced Pattern. Response incoming");
+        result += '```';
+        const response = {plain: `${message.author}\n${result}`};
+        return Promise.resolve(response);
     }
 
     basicResponse(fromPattern, args, message)
