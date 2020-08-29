@@ -3,7 +3,7 @@
 
 // We are using this as a means of trying to get this bullshit to work
 // We will be moving this to its own file eventually
-const config = require('./config.json');;
+const config = require('./config.json');
 const graf = require('discord-graf');
 const debugCommand = require('./commands/test/debug-command');
 const rollCommand = require('./commands/basic/roll');

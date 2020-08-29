@@ -1,7 +1,6 @@
 {
   "name": "discord-bot-dixe",
   "version": "0.0.1",
-  "type": "module",
   "description": "Discord bot to make life easier for use when we play TTRPGs",
   "scripts": {
     "build": "gulp"
