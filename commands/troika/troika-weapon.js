@@ -23,7 +23,7 @@ module.exports = class TroikaWeaponRoll extends graf.Command
 
     run(message, args)
     {
-        const result = diceUtility.rollTroikaTable(args[0], null);
+        const result = diceUtility.rollAttackTable(args[0], null);
         const output = `threw a ***${result.weapon}*** with ***${result.result}*** dmg`;
         return Promise.resolve(output);
     }
