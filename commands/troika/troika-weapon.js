@@ -1,4 +1,5 @@
 
+
 const graf = require('discord-graf');
 const diceUtility = require('dice-utility')
 
@@ -23,8 +24,9 @@ module.exports = class TroikaWeaponRoll extends graf.Command
 
     run(message, args)
     {
-        const result = diceUtility.rollTroikaTable(args[0], null);
-        const output = `threw a ***${result.weapon}*** with ***${result.result}*** dmg`;
+        this.bot.logger.info("Dice utility "+diceUtility+" args: "+args[0]+" "+args[1]);
+        const result = diceUtility.rollAttackTable(args[0], args[1]);
+        const output = `threw a ***${result.weapon}*** with ***${result.result}*** dmg - (${result.roll})`;
         return Promise.resolve(output);
     }
 }
